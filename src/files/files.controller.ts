@@ -19,7 +19,6 @@ import { ConfigService } from '@nestjs/config';
 @Controller('files')
 export class FilesController {
   constructor(
-    
     private readonly filesService: FilesService,
     private readonly configService: ConfigService,
   ) {}
@@ -44,7 +43,7 @@ export class FilesController {
     }
 
     const secureUrl = `${this.configService.get('HOST_API')}/files/product/${file.filename}`;
-  
+
     return { secureUrl };
   }
 
