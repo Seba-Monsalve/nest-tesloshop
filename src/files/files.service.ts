@@ -4,19 +4,13 @@ import { join } from 'path';
 
 @Injectable()
 export class FilesService {
-
-
-  uploadFile(file) {
-  }
-  
+  uploadFile(file) {}
 
   getStaticFile(filename: string) {
-    const path=  join(__dirname, '..', '..', 'static', 'products', filename);
-    if(!existsSync(path)){
+    const path = join(__dirname, '..', '..', 'static', 'products', filename);
+    if (!existsSync(path)) {
       throw new BadRequestException('File not found!');
     }
-    return path
-
+    return path;
   }
-
 }

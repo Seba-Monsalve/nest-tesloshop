@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
+import { User } from 'src/auth/entities/auth.entity';
 
 @Injectable()
 export class ProductsService {
@@ -27,11 +28,12 @@ export class ProductsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, user: User) {
     try {
       const { images, ...rest } = createProductDto;
       const product = this.productRepository.create({
         ...rest,
+        user,
         images: images.map((image) => {
           const productImage = this.productImageRepository.create({
             url: image,
@@ -92,7 +94,7 @@ export class ProductsService {
     return { ...product, images: product.images?.map((image) => image.url) };
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, user: User) {
     const { images, ...rest } = updateProductDto;
     let product = await this.productRepository.preload({
       id,
@@ -119,7 +121,8 @@ export class ProductsService {
       } else {
       }
 
-      await queryRunner.manager.save(product.images);
+      product.user = user;
+      await queryRunner.manager.save(product);
       await queryRunner.commitTransaction();
       await queryRunner.release();
 
@@ -152,11 +155,9 @@ export class ProductsService {
 
   async deleteAllProducts() {
     const query = this.productRepository.createQueryBuilder('product');
-    
-    
+
     try {
       await query.delete().execute();
-
     } catch (error) {
       this.handleError(error);
     }

@@ -3,12 +3,14 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProductImage } from './product-image.entity';
+import { User } from 'src/auth/entities/auth.entity';
 
-@Entity({name: 'products'}) // Nombre de la tabla en la base de datos
+@Entity({ name: 'products' }) // Nombre de la tabla en la base de datos
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -42,6 +44,9 @@ export class Product {
     eager: true,
   })
   images?: ProductImage[];
+
+  @ManyToOne(() => User, (user) => user.product, { eager: true })
+  user: User;
 
   @BeforeInsert()
   checkSlugInsert() {
